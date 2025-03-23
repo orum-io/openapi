@@ -370,6 +370,9 @@ components:
           type: string
         message:
           type: string
+      required:
+        - error_code
+        - message
     ControlErrorResponse:
       type: object
       properties:
@@ -382,8 +385,8 @@ components:
     UsBankAccountNumber:
       title: UsBankAccountNumber
       type: string
-      pattern: ^(?:\d-{0,1}){0,16}\d$
-      description: Account number for US bank account. 17 digits maximum.
+      pattern: ^(?:\d-{0,1}){3,16}\d$
+      description: Account number for US bank account. 4 to 17 digits are acceptable.
     AbaRoutingNumber:
       title: AbaRoutingNumber
       type: string
@@ -409,7 +412,15 @@ components:
     AccountHolderName:
       type: string
       description: Name of account holder. Accepts alphanumeric characters and hyphens, dashes, periods, apostrophes, spaces, and diacritics.
-      pattern: ^[^\s][&’0-9_a-zA-ZàáâäãåąāčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-/:#;<>]+$
+      pattern: ^([ ’!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſ]*|)$
+      maxLength: 255
+      minLength: 1
+    SenderName:
+      type: string
+      description: Name of sender initiating the verification request. This name will appear on the statement and should be recognizable to the account holder. Accepts alphanumeric characters and hyphens, dashes, periods, apostrophes, spaces, and diacritics.
+      pattern: ^([ ’!"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~¡¢£¤¥¦§¨©ª«¬®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžſ]*|)$
+      maxLength: 255
+      minLength: 1
     VerifyAccountRequest:
       title: VerifyAccountRequest
       type: object
@@ -420,7 +431,7 @@ components:
       properties:
         type:
           allOf:
-            - $ref: '#/components/schemas/AccountType'
+            - $ref: '#/components/schemas/VerifyAccountType'
           x-orum-error-invalid:
             message: Type is invalid. Pass in either 'status', 'control', 'status_ownership' or 'control_ownership'.
             code: invalid_type
@@ -430,13 +441,14 @@ components:
           allOf:
             - $ref: '#/components/schemas/UsBankAccountNumber'
           x-orum-error-missing:
-            message: Account number is required. Pass an account number with 17 digits or fewer.
+            message: Account number is required. Pass an account number with 4 to 17 digits.
             code: missing_account_number
           x-orum-error-invalid:
-            message: Account number is invalid. Pass an account number with 17 digits or fewer.
+            message: Account number is invalid. Pass an account number with 4 to 17 digits.
             code: invalid_account_number
           x-oapi-codegen-extra-tags:
             csv: account_number
+          example: 101044595
         routing_number:
           allOf:
             - $ref: '#/components/schemas/AbaRoutingNumber'
@@ -448,6 +460,7 @@ components:
             code: invalid_routing_number
           x-oapi-codegen-extra-tags:
             csv: routing_number
+          example: 21000021
         account_holder_name:
           allOf:
             - $ref: '#/components/schemas/AccountHolderName'
@@ -459,6 +472,7 @@ components:
             code: invalid_account_holder_name
           x-oapi-codegen-extra-tags:
             csv: account_holder_name
+          example: John Doe
         email:
           allOf:
             - $ref: '#/components/schemas/Email'
@@ -473,6 +487,16 @@ components:
         person:
           allOf:
             - $ref: '#/components/schemas/OwnershipPersonRequest'
+          example:
+            first_name: John
+            last_name: Doe
+        sender_name:
+          allOf:
+            - $ref: '#/components/schemas/SenderName'
+          x-orum-error-invalid:
+            message: Sender name is invalid.
+            code: invalid_sender_name
+          example: Acme
     VerifyAccountControlRequest:
       title: VerifyAccountControlRequest
       type: object
@@ -530,6 +554,8 @@ components:
           $ref: '#/components/schemas/DebitStatusReason'
         estimated_verification_date:
           $ref: '#/components/schemas/EstimatedVerificationDate'
+        sender_name:
+          $ref: '#/components/schemas/SenderName'
     VerifyAccountResponse:
       title: VerifyAccountResponse
       type: object
@@ -673,7 +699,7 @@ components:
       type: string
       format: email
       description: Email address to notify once the statement code is sent to the account to verify account control.
-    AccountType:
+    VerifyAccountType:
       type: string
       description: The type of verify request to make. If not provided, we will default to "status".
       enum:

@@ -9,7 +9,6 @@ paths:
   /oauth/token:
     post:
       summary: Request an access token
-      description: <a href="https://orum.io/contact/" target="_blank">Contact us</a> to access your Monitor payments portal, where you can set up login credentials and <a href="https://docs.orum.io/docs/inviting-team-members" target="_blank">invite additional teammates</a>.<br /><br />Use this <code>/oauth/token</code> endpoint to exchange API credentials created in Monitor (client_id and client_secret) for an <code>access_token</code>.<br /><br /> To authenticate to all protected Orum endpoints, pass the <code>access_token</code> in the Authorization header <code>Bearer ${token}</code>.<br />The auth token is valid for one hour.
       tags:
         - How to authenticate
       operationId: post-oauth-token
